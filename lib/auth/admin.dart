@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:Brikkhayon/models/admin_chart.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../models/admin_chart_model.dart';
+import 'auth.dart';
 
 class Admin extends StatefulWidget {
   const Admin({Key? key}) : super(key: key);
@@ -21,6 +25,7 @@ class _AdminState extends State<Admin> {
     AdminSeries(year: "Apr", subscribers: 3500, barColor: charts.ColorUtil.fromDartColor(Colors.amber)),
     AdminSeries(year: "May", subscribers: 6000, barColor: charts.ColorUtil.fromDartColor(Colors.deepPurpleAccent)),
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,28 +53,19 @@ class _AdminState extends State<Admin> {
               child: Column(
                 children: [
                   Container(
-                    height: 300,
-                    margin: EdgeInsets.all(20),
-                    child: Card(
-                      elevation: 20,
-                      child: Column(
-                        children: [
-                          Container(
-                              margin: EdgeInsets.only(top: 20),
-                              child: Text("Users of application by month:", style: TextStyle(fontWeight: FontWeight.bold),)
-                          ),
-                          Expanded(
-
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              child: AdminChart(
-                                data: data,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    margin: EdgeInsets.only(top: 20,bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Text(
+                          "Admin",
+                          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 17),
+                        ),
+                      ],
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
                   ),
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 20),
@@ -88,7 +84,9 @@ class _AdminState extends State<Admin> {
                                     child: Image.asset('assets/images/users.png',),
                                   ),
                                   iconSize: 130,
-                                  onPressed: null,
+                                  onPressed: (){
+                                    Navigator.pushNamed(context, '/allusers');
+                                  },
                                 ),
                                 Text('Users', style: TextStyle(fontWeight: FontWeight.bold),),
                               ],
@@ -107,7 +105,9 @@ class _AdminState extends State<Admin> {
                                     child: Image.asset('assets/images/plants.png'),
                                   ),
                                   iconSize: 130,
-                                  onPressed: null,
+                                  onPressed: (){
+                                    Navigator.pushNamed(context, '/adminallplants');
+                                  },
                                 ),
                                 Text('Plants', style: TextStyle(fontWeight: FontWeight.bold),),
                               ],
@@ -134,7 +134,9 @@ class _AdminState extends State<Admin> {
                                     child: Image.asset('assets/images/transaction.png'),
                                   ),
                                   iconSize: 130,
-                                  onPressed: null,
+                                  onPressed: (){
+                                    Navigator.pushNamed(context, '/transactions');
+                                  },
                                 ),
                                 Text('Transactions', style: TextStyle(fontWeight: FontWeight.bold),),
                               ],
@@ -153,7 +155,15 @@ class _AdminState extends State<Admin> {
                                       child: Image.asset('assets/images/adminout.png'),
                                     ),
                                     iconSize: 130,
-                                    onPressed: (){Navigator.pushNamed(context, '/');}
+                                    onPressed: (){
+                                      isAdmin = false;
+                                      FirebaseAuth.instance.signOut();
+                                      const snackBar = SnackBar(
+                                        content: Text('You are now logged out!'),
+                                      );
+                                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                      Navigator.pushNamed(context, '/splash_screen');
+                                    }
                                 ),
                                 Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold),),
                               ],

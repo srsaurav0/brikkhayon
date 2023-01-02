@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Brikkhayon/auth/profilepage.dart';
+import 'package:Brikkhayon/auth/globals.dart';
 import 'package:Brikkhayon/home/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,8 +13,7 @@ class VerifyEmailPage extends StatefulWidget {
   _VerifyEmailPageState createState() => _VerifyEmailPageState();
 }
 
-class _VerifyEmailPageState extends State<VerifyEmailPage>{
-
+class _VerifyEmailPageState extends State<VerifyEmailPage> {
   bool isEmailVerified = false;
   bool canResendEmail = false;
   Timer? timer;
@@ -24,13 +24,38 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>{
 
     isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
 
-    if(!isEmailVerified){
-      sendVerificationMail();
+    // final message = SnackBar(
+    //     content: Text(
+    //         'A verification email has been sent to your email. Please very to continue...'));
+
+    if (!isEmailVerified) {
+      try {
+        sendVerificationMail();
+        Fluttertoast.showToast(
+            msg: "Verification email has been sent successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } catch (e) {
+        Fluttertoast.showToast(
+            msg: e.toString(),
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+
+      // ScaffoldMessenger.of(context).showSnackBar(message);
 
       timer = Timer.periodic(
         Duration(seconds: 3),
-          (_) => checkEmailVerified(),
+        (_) => checkEmailVerified(),
       );
+    } else {
+      isLoggedIn = true;
     }
   }
 
@@ -47,22 +72,23 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>{
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
 
-    if(isEmailVerified) timer?.cancel();
+    if (isEmailVerified) {
+      timer?.cancel();
+    }
   }
 
-  Future sendVerificationMail() async{
+  Future sendVerificationMail() async {
     try {
       final user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
 
       Fluttertoast.showToast(
-          msg:"Verification email has been sent successfully",
+          msg: "Verification email has been sent successfully",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
           textColor: Colors.white,
-          fontSize: 16.0
-      );
+          fontSize: 16.0);
 
       // setState(() => canResendEmail = false);
       // await Future.delayed(Duration(seconds: 5));
@@ -74,20 +100,20 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>{
           gravity: ToastGravity.CENTER,
           timeInSecForIosWeb: 1,
           textColor: Colors.white,
-          fontSize: 16.0
-      );
+          fontSize: 16.0);
     }
   }
 
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? HomePageWidget()
+      ? Home()
       : Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0.0,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_outlined, color: Colors.green),
+              icon:
+                  Icon(Icons.arrow_back_ios_new_outlined, color: Colors.green),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
@@ -97,19 +123,16 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>{
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-
                     Container(
                       //color: Colors.blue,
                       alignment: Alignment.topCenter,
                       height: 105,
                       margin: EdgeInsets.only(top: 0.0),
-                      child: Image.asset(
-                          'assets/images/splash.png'
-                      ),
+                      child: Image.asset('assets/images/splash.png'),
                     ),
                     Container(
                       //color: Colors.amber,
-                      margin: EdgeInsets.only(top: 60.0,left: 20),
+                      margin: EdgeInsets.only(top: 60.0, left: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'A verification email has been sent to your registered email address',
@@ -127,13 +150,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>{
                           width: 500,
                           height: 60,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5 ),
+                            borderRadius: BorderRadius.circular(5),
                             color: Color(0xff056608),
                           ),
                           child: TextButton.icon(
-                            icon: Icon(
-                              Icons.email
-                            ),
+                            icon: Icon(Icons.email),
                             label: Text('Resend Email'),
                             style: TextButton.styleFrom(
                               //padding: EdgeInsets.only(left:205.0,right: 205.0,top:25.0,bottom: 25.0),
@@ -142,30 +163,30 @@ class _VerifyEmailPageState extends State<VerifyEmailPage>{
                                 fontSize: 18,
                               ),
                             ),
-                            onPressed: canResendEmail? sendVerificationMail : null,
-                          )
-                      ),
+                            onPressed: sendVerificationMail,
+                          )),
                     ),
-                    SizedBox(height: 16,),
+                    SizedBox(
+                      height: 16,
+                    ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: TextButton(
-                        style: ElevatedButton.styleFrom(
-                          maximumSize: Size.fromHeight(50),
-                        ),
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 18,
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: TextButton(
+                          style: ElevatedButton.styleFrom(
+                            maximumSize: Size.fromHeight(50),
                           ),
-                        ),
-                        onPressed: () => FirebaseAuth.instance.signOut(),
-                      )
-                    ),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          onPressed: () => FirebaseAuth.instance.signOut(),
+                        )),
                   ],
                 ),
               ),
             ),
           ),
-    );
+        );
 }

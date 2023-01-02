@@ -4,6 +4,8 @@ import 'package:Brikkhayon/blocks/auth_block.dart';
 import 'signin.dart';
 import 'signup.dart';
 
+bool isAdmin = false;
+
 class Auth extends StatelessWidget {
   final List<Widget> tabs = [
     SignUp(),

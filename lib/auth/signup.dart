@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:Brikkhayon/auth/signin.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,17 +18,48 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
 
   final formKey = GlobalKey<FormState>();
+
+  final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final conpasswordController = TextEditingController();
 
   @override
   void dispose(){
+
+    usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     conpasswordController.dispose();
 
     super.dispose();
+  }
+  String imageUrl = " ";
+  void getImage() async{
+    final DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection("sourceimage").doc(FirebaseAuth.instance.currentUser!.uid).get();
+    setState(() {
+      imageUrl = userDoc.get('image');
+      print(imageUrl);
+    });
+  }
+
+  void uploadData() async {
+    try{
+
+      getImage();
+      FirebaseFirestore.instance.collection("userdetails").doc(FirebaseAuth.instance.currentUser!.uid).set({
+        'username':usernameController.text.trim(),
+        'email':emailController.text.trim(),
+        'password' : passwordController.text.trim(),
+        'createdAt' : DateTime.now(),
+        'image' : imageUrl,
+        'userId' : FirebaseAuth.instance.currentUser!.uid,
+      });
+      //Fluttertoast.showToast(msg: "Completed upload");
+    }
+    catch(e){
+      Fluttertoast.showToast(msg: "error occuerd for storing user info!");
+    }
   }
 
   @override
@@ -82,6 +117,7 @@ class _SignUpState extends State<SignUp> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 0.0),
                                 child: TextFormField(
+                                  controller: usernameController,
                                   textInputAction: TextInputAction.next,
                                   autovalidateMode: AutovalidateMode.onUserInteraction,
                                   validator: (uname) => uname == '' ? 'Enter a valid username' : null,
@@ -237,7 +273,7 @@ class _SignUpState extends State<SignUp> {
                                     }
                                     else{
                                       Fluttertoast.showToast(
-                                          msg: 'Something went wrong',
+                                          msg: 'Passwords do not match!',
                                           toastLength: Toast.LENGTH_SHORT,
                                           gravity: ToastGravity.CENTER,
                                           timeInSecForIosWeb: 1,
@@ -263,9 +299,6 @@ class _SignUpState extends State<SignUp> {
                           ),
                           SizedBox(height: 1),
                           TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/signin');
-                            },
                             child: Text(
                               'Sign In',
                               style: TextStyle(
@@ -274,6 +307,9 @@ class _SignUpState extends State<SignUp> {
                                 color: Colors.black54,
                               ),
                             ),
+                            onPressed: () {
+                              Navigator.push(context,MaterialPageRoute(builder: (context) => SignIn()));
+                            },
                           ),
 
                         ],),
@@ -294,8 +330,9 @@ class _SignUpState extends State<SignUp> {
 
     showDialog(
         context: context,
-        barrierDismissible: false,
-        builder: (context) => Center(child: CircularProgressIndicator())
+        builder: (context) {
+          return Center(child: CircularProgressIndicator());
+        }
     );
 
     try {
@@ -303,7 +340,18 @@ class _SignUpState extends State<SignUp> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
       );
+      Navigator.of(context).pop();
+      Fluttertoast.showToast(
+          msg: 'Registered successfully! Please verify your email to sign in...',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+      Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
     } on FirebaseAuthException catch (e) {
+      Navigator.of(context).pop();
       Fluttertoast.showToast(
           msg: e.toString(),
           toastLength: Toast.LENGTH_SHORT,
@@ -313,7 +361,6 @@ class _SignUpState extends State<SignUp> {
           fontSize: 16.0
       );
     }
-
-    navigatorKey.currentState!.popUntil((route) => route.isFirst);
+    uploadData();
   }
 }

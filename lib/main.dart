@@ -1,3 +1,9 @@
+import 'package:Brikkhayon/adminallplants.dart';
+import 'package:Brikkhayon/aftersearched.dart';
+import 'package:Brikkhayon/auth/allusers.dart';
+import 'package:Brikkhayon/auth/userallplants.dart';
+import 'package:Brikkhayon/recognition/main.dart';
+import 'package:Brikkhayon/transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:Brikkhayon/auth/admin.dart';
 import 'package:Brikkhayon/auth/chatbot.dart';
@@ -25,7 +31,15 @@ import 'auth/signin.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
+import 'categoriesitem_climbers.dart';
+import 'categoriesitem_herbs.dart';
+import 'categoriesitem_shrubs.dart';
+import 'categoriesitem_trees.dart';
+import 'nearbyplants.dart';
+import 'orders.dart';
+
 Future main() async{
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final Locale locale = Locale('en');
@@ -72,7 +86,19 @@ Future main() async{
         '/wishlist': (BuildContext context) => WishList(),
         '/cart': (BuildContext context) => CartList(),
         '/settings': (BuildContext context) => Settings(),
-        '/products': (BuildContext context) => Products()
+        '/allusers': (BuildContext context) => Allusers(),
+        '/userallplants': (BuildContext context) => UserPlant(),
+        '/orders': (BuildContext context) => Orders(),
+        '/transactions': (BuildContext context) => Transactions(),
+        '/aftersearched': (BuildContext context) => MySearchPlant(),
+        '/categoriesitem_shrubs': (BuildContext context) => CategoriseItem(),
+        '/categoriesitem_herbs': (BuildContext context) => CategoriseItemHerbs(),
+        '/categoriesitem_climbers': (BuildContext context) => CategoriseItemClimbers(),
+        '/categoriesitem_trees': (BuildContext context) => CategoriseItemTrees(),
+        '/nearbyPlants': (BuildContext context) => NearbyPlants(),
+        '/adminallplants': (BuildContext context) => AdminAllPlants(),
+        '/recognition': (BuildContext context) => MyRecApp(),
+        '/products': (BuildContext context) => Products(text: '', name: '', about: '', address: '', createdAt: '', image: '', price: '', email: '', parentid: '',),
       },
     ),
   ));

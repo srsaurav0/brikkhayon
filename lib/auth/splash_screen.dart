@@ -176,29 +176,71 @@ class _BottomPart extends StatelessWidget {
               alignment: Alignment.center,
               child: Container(
                 height: 55.0,
-                width: MediaQuery.of(context).size.width * 0.75,
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  border: Border.all(color: Colors.white, width: 2.0),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(50),
-                  ),
-                ),
-                  child: TextButton(
-                    child: Text('GET  STARTED'),
-                    style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      //padding: EdgeInsets.only(left:205.0,right: 205.0,top:25.0,bottom: 25.0),
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        letterSpacing: 2
-                      ),
-                    ),
+                //width: MediaQuery.of(context).size.width * 0.75,
+                // decoration: BoxDecoration(
+                //   shape: BoxShape.rectangle,
+                //   border: Border.all(color: Colors.white, width: 2.0),
+                //   borderRadius: BorderRadius.all(
+                //     Radius.circular(50),
+                //   ),
+                // ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          border: Border.all(color: Colors.white, width: 2.0),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(50),
+                          ),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: TextButton(
+                          child: Text('SIGN IN'),
+                          style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            //padding: EdgeInsets.only(left:205.0,right: 205.0,top:25.0,bottom: 25.0),
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              letterSpacing: 2
+                            ),
+                          ),
 
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/');
-                    },
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/signin');
+                          },
+                        ),
+                      ),
+
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          border: Border.all(color: Colors.white, width: 2.0),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(50),
+                          ),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: TextButton(
+                          child: Text('SIGN UP'),
+                          style: TextButton.styleFrom(
+                            primary: Colors.white,
+                            //padding: EdgeInsets.only(left:205.0,right: 205.0,top:25.0,bottom: 25.0),
+                            textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                letterSpacing: 2
+                            ),
+                          ),
+
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/signup');
+                          },
+                        ),
+                      ),
+                    ],
                   ),
 
 

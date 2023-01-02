@@ -1,10 +1,48 @@
+import 'package:Brikkhayon/cart.dart';
+import 'package:Brikkhayon/plantlocation.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Products extends StatelessWidget {
+  String text,name,about,address,createdAt,image,price,email,parentid;
+
+
+  Products(
+      {   required this.text,
+        required this.name,
+        required this.about,
+        required this.address,
+        required this.createdAt,
+        required this.image,
+        required this.price,
+        required this.email,
+        required this.parentid,
+      });
+
+  //final reference = FirebaseDatabase.instance.ref().child("allplants").child("${text}");
+  // final snapshot = reference.child('allplants/$text/price').get();
+  //  String newTxt = text.toString();
+  //DatabaseReference dbRefrence = FirebaseDatabase.instance.ref().child("allplants").child(text);
+
+  //DateTime date = createdAt.toDate();
+
   @override
   Widget build(BuildContext context) {
+    void getLocation(String address) async{
+      final preference = await SharedPreferences.getInstance();
+      List<Location> location = await locationFromAddress(address);
+      print(location.first);
+      double d1 = location.first.latitude;
+      double d2 = location.first.longitude;
+      preference.setDouble('latitute', d1);
+      preference.setDouble('longitute', d2);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => PlantLocation()));
+    }
     final imageUrl = ModalRoute.of(context)!.settings.arguments;
     return Scaffold(
       backgroundColor: Colors.white,
@@ -27,12 +65,13 @@ class Products extends StatelessWidget {
             children: <Widget>[
               Container(
                 margin: EdgeInsets.only(top: 20),
-                child: ClipOval(
-                  child: SizedBox.fromSize(
-                    size: Size.fromRadius(98), // Image radius
+                child: ClipRRect(
+                  child: SizedBox(
+                    height: 320, // Image radius
+                    width: double.infinity,
                     child: CachedNetworkImage(
                       fit: BoxFit.cover,
-                      imageUrl: imageUrl.toString(),
+                      imageUrl: image,
                       placeholder: (context, url) =>
                           Center(child: CircularProgressIndicator()),
                       errorWidget: (context, url, error) =>
@@ -53,13 +92,13 @@ class Products extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Money Plant',
+                              '${name}',
                               style: TextStyle(
                                   color: Color(0xFF056608),
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600),
                             ),
-                            Text('Uploaded by\nabc@gmail.com',
+                            Text('Uploaded by\n' + email,
                                 textAlign: TextAlign.end,
                                 style: TextStyle(
                                   color: Color(0xFF056608),
@@ -77,7 +116,7 @@ class Products extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(right: 10.0),
                             child: Text(
-                              '৳ 120',
+                              price + " Tk",
                               style: TextStyle(
                                 color: Color(0xFF056608),
                                 fontSize: 20,
@@ -93,15 +132,20 @@ class Products extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          RatingStars(
-                            value: 5,
-                            starSize: 16,
-                            valueLabelColor: Colors.amber,
-                            starColor: Colors.amber,
-                            valueLabelVisibility: false,
+                          SizedBox(
+                            width: 200,
+                            child: Text(
+                              DateFormat.yMMMEd().format(DateTime.parse(createdAt)),
+
+                            ),
                           ),
+                          // Timestamp t = createdAt as Timestamp;
+                          // DateTime date = t.toDate();
                           TextButton.icon(
-                            onPressed: null,
+                            onPressed: (){
+                              print(address);
+                              getLocation(address);
+                            },
                             style: TextButton.styleFrom(
                                 side: BorderSide(
                                     width: 1, color: Color(0xFF056608))),
@@ -143,7 +187,7 @@ class Products extends StatelessWidget {
                                 padding: EdgeInsets.only(
                                     left: 15.0, right: 15, bottom: 20),
                                 child: Text(
-                                  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. but also the leap into electronic typesetting Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
+                                  about,
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 16
@@ -161,7 +205,14 @@ class Products extends StatelessWidget {
                           color: Color(0xFF056608)
                       ),
                       child: TextButton.icon(
-                        onPressed: null,
+                        onPressed: (){
+                          //Navigator.pushNamed(context, '/cart');
+                          sendToCart(parentid);
+                          print(parentid);
+                          //Navigator.push(context, MaterialPageRoute(builder: (context) => CartList()));
+                          //print(text);
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => CartList()));
+                        },
                         style: TextButton.styleFrom(
                           minimumSize: const Size.fromHeight(50),
                         ),
@@ -184,5 +235,12 @@ class Products extends StatelessWidget {
         ),
       ),
     );
+
+  }
+
+  void sendToCart(String parentid) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('parentid', parentid);
+    print(parentid);
   }
 }
